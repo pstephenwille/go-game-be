@@ -1,0 +1,43 @@
+{
+  "name": "services",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "This project was bootstrapped with Fastify-CLI.",
+  "main": "app.ts",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "serverless offline start --reloadHandler",
+    "ship": "serverless deploy",
+    "infra-up": "docker compose up -d",
+    "test-local": "vitest run --mode dev --project local-container",
+    "test-e2e": "vitest run --mode dev  --project cloud-e2e"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.585.0",
+    "@aws-sdk/lib-dynamodb": "^3.585.0",
+    "@fastify/aws-lambda": "^6.4.0",
+    "@fastify/sensible": "^6.0.0",
+    "fastify": "^5.10.0",
+    "fastify-plugin": "^5.0.0",
+    "fastify-type-provider-zod": "^7.0.0",
+    "uuid": "^14.0.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.5",
+    "@vitest/coverage-v8": "^4.1.10",
+    "serverless": "^4.41.0",
+    "serverless-offline": "^14.7.4",
+    "tsx": "^4.23.9",
+    "typescript": "~5.9.2",
+    "vite": "^8.0.0",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.1.10",
+    "wait-on": "^9.1.0"
+  }
+}

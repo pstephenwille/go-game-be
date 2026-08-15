@@ -1,0 +1,93 @@
+org: swille
+app: go-game-services
+service: go-game-services
+
+useDotenv: true
+
+
+provider:
+  name: aws
+  runtime: nodejs24.x
+  architecture: arm64
+  stage: ${env:STAGE, 'dev'}
+
+  environment:
+    GO_GAME_TABLE_NAME: ${env:GO_GAME_TABLE_NAME}
+    # References the source of truth cleanly. Inside your code: process.env.STAGE
+    STAGE: ${sls:stage}
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - Fn::GetAtt:
+                - GoGameTable
+                - Arn
+            - Fn::Join:
+                - /
+                - - Fn::GetAtt:
+                      - GoGameTable
+                      - Arn
+                  - index
+                  - "*"
+
+# =========================================================================
+# PARAMETERS LINKED TO THE STAGE
+# Serverless automatically extracts the matching stage from provider.stage
+# =========================================================================
+params:
+  default:
+    tableName: ${env:GO_GAME_TABLE_NAME}
+    minify: false
+    sourcemap: true
+  prod:
+    minify: true
+    sourcemap: false
+  dev:
+    minify: false
+    sourcemap: true
+
+functions:
+  api:
+    handler: src/handler.handler
+    events:
+      - httpApi: "*"
+
+build:
+  esbuild:
+    bundle: true
+    format: esm
+    # Dynamically maps straight to the parameters based on the resolved stage
+    minify: ${param:minify}
+    sourcemap: ${param:sourcemap}
+    banner:
+      js: 'import { createRequire } from "node:module"; const require = createRequire(import.meta.url);'
+
+custom:
+  serverless-dynamodb:
+    start:
+      noStart: true
+      port: 8000
+      migrate: true
+
+resources:
+  Resources:
+    GoGameTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.GO_GAME_TABLE_NAME}
+        AttributeDefinitions: ${file(./config/dynamo/table-schema.json):AttributeDefinitions}
+        KeySchema: ${file(./config/dynamo/table-schema.json):KeySchema}
+        BillingMode: ${file(./config/dynamo/table-schema.json):BillingMode}
+        GlobalSecondaryIndexes: ${file(./config/dynamo/table-schema.json):GlobalSecondaryIndexes}
+
+plugins:
+  - serverless-offline

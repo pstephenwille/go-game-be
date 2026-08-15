@@ -1,0 +1,29 @@
+ [
+      {
+      "PutRequest": {
+        "Item": {
+          "userId": "d8c56429-2b7f-432f-a7d1-9cc9dc550926",
+          "email": "fake.test@mock.app",
+          "name": "Fake Test"
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "userId": "2e826cb5-ae4f-49c9-98f0-608402a4c253",
+          "email": "bob.jones@example.com",
+          "name": "Bob Jones"
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "userId": "de981843-7ded-4129-a4ea-63e035a79814",
+          "email": "charlie.brown@example.com",
+          "name": "Charlie Brown"
+        }
+      }
+    }
+  ]

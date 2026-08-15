@@ -1,0 +1,57 @@
+services:
+  dynamodb-local:
+    user: root
+    image: amazon/dynamodb-local:2.5.3
+    container_name: local-dynamodb
+    ports:
+      - "8000:8000"
+    working_dir: /home/dynamodblocal
+    volumes:
+      - ./config/dynamo/logs:/home/dynamodblocal/logs
+      - ./config/dynamo/data:/home/dynamodblocal/data
+    entrypoint: [ "sh", "-c", "java -jar DynamoDBLocal.jar \
+     -sharedDb -dbPath ./data \
+     | tee -a /home/dynamodblocal/logs/dynamodb.log" ]
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8000 && exec 3<&-"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+
+  dynamodb-initializer:
+    depends_on:
+      dynamodb-local:
+        condition: service_healthy
+    image: node:22-slim
+    env_file:
+      - .env
+      - .env.dev
+      - .env.dev.local
+    container_name: dynamodb-initializer
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./config/dynamo/logs:/home/dynamodblocal/logs
+    environment:
+      - LOG_LEVEL=debug
+      - NODE_ENV=local
+      - AWS_REGION=us-west-1
+      - AWS_DYNAMO_ENDPOINT=http://dynamodb-local:8000
+      - PNPM_CONFIG_STORE_DIR=/root/.local/share/pnpm/store
+    entrypoint: [
+      "sh", "-c",
+      "corepack enable && \ 
+       pnpm install --ignore-scripts --dir /usr/src/app && \ 
+       pnpm dlx --allow-build=esbuild tsx ./config/dynamo/setup-and-seed-table.ts" ]
+
+  # 2. DocumentDB Emulation (Official MongoDB Image)
+  documentdb-local:
+    image: mongo:6.0
+    container_name: local-documentdb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin

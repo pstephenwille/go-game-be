@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schemastore.org",
+  "compilerOptions": {
+    "types": ["node"],
+    "moduleResolution": "bundler",
+    /* Target & Runtime Environments */
+    "target": "ES2023",                  // Modern JavaScript baseline
+
+    /* Strictness & Code Quality */
+    "strict": true,                      // Activates all foundational type checks
+    "noImplicitAny": true,               // Prevents fallback inferred 'any' types
+    "strictNullChecks": true,            // Enforces explicit null and undefined safety
+    "strictFunctionTypes": true,         // Ensures strict checking of function types
+    "noUncheckedIndexedAccess": true,    // Enforces safety checks on array/object lookups
+
+    /* Linter-like Code Rules */
+    "noUnusedLocals": true,              // Reports errors on unused local variables
+    "noUnusedParameters": true,          // Reports errors on unused function parameters
+    "noImplicitReturns": true,           // Ensures all code paths in functions return a value
+    "noFallthroughCasesInSwitch": true,  // Prevents bugs caused by missing break statements
+
+    /* Module & Interop Tuning */
+    "esModuleInterop": true,             // Smooths compatibility gaps with CommonJS modules
+    "forceConsistentCasingInFileNames": true, // Prevents cross-platform file import issues
+    "verbatimModuleSyntax": true,        // Enforces clean, predictable type imports/exports
+
+    /* Build Performance Optimization */
+    "skipLibCheck": true                 // Fast compilation; avoids deep scans of node_modules
+  }
+}
